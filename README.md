@@ -2,12 +2,6 @@
 
 [![CircleCI](https://circleci.com/gh/cetic/helm-nifi.svg?style=svg)](https://circleci.com/gh/cetic/helm-nifi/tree/master) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) ![version](https://img.shields.io/github/tag/cetic/helm-nifi.svg?label=release) ![test](https://github.com/cetic/helm-nifi/actions/workflows/test.yml/badge.svg)
 
-## $${\color{red}Maintainers \space Wanted}$$
-
-$${\color{red}This \space project \space is \space not \space maintained \space anymore.}$$
-
-If you are interested in maintaining a fork of this project, please chime in in the [dedicated issue](https://github.com/cetic/helm-nifi/issues/330).
-
 ## Introduction
 
 This [Helm](https://helm.sh/) chart installs [Apache NiFi](https://nifi.apache.org/) 1.23.2 in a [Kubernetes](https://kubernetes.io/) cluster.
@@ -169,7 +163,8 @@ The following table lists the configurable parameters of the nifi chart and the 
 | `auth.oidc.clientId`                                                        | oidc clientId                                                                                                      | `nil`                           |
 | `auth.oidc.clientSecret`                                                    | oidc clientSecret                                                                                                  | `nil`                           |
 | `auth.oidc.claimIdentifyingUser`                                            | oidc claimIdentifyingUser                                                                                          | `email`                         |
-| `auth.oidc.preferredJwsAlgorithm`                                            | The preferred algorithm for validating identity tokens. If this value is blank, it will default to RS256 which is required to be supported by the OpenID Connect Provider according to the specification. If this value is HS256, HS384, or HS512, NiFi will attempt to validate HMAC protected tokens using the specified client secret. If this value is none, NiFi will attempt to validate unsecured/plain tokens.                                                                                           | `nil`                         |
+| `auth.oidc.claimGroups`                                                     | oidc claimGroups added in nifi 1.19.0, allows nifi to assign groups to oidc user.                                                                                         | `groups`                         |
+| `auth.oidc.preferredJwsAlgorithm`                                           | The preferred algorithm for validating identity tokens. If this value is blank, it will default to RS256 which is required to be supported by the OpenID Connect Provider according to the specification. If this value is HS256, HS384, or HS512, NiFi will attempt to validate HMAC protected tokens using the specified client secret. If this value is none, NiFi will attempt to validate unsecured/plain tokens.                                                                                           | `nil`                         |
 | `auth.oidc.admin`                                                           | Default OIDC admin identity                                                                                        | `nifi@example.com`              |
 | Note that OIDC authentication to a multi-NiFi-node cluster requires Ingress sticky sessions | See [background](https://community.cloudera.com/t5/Support-Questions/OIDC-With-Azure-AD/m-p/232324#M194163)      | Also [how](https://kubernetes.github.io/ingress-nginx/examples/affinity/cookie/) |
 | **postStart**                                                               |

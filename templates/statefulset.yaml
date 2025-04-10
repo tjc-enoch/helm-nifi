@@ -253,6 +253,20 @@ spec:
 
 {{- /* if .Values.certManager.enabled */}}{{ else }}
 
+          prop_replace nifi.security.keystore "${NIFI_HOME}/tls/keystore.jks"
+          prop_replace nifi.security.keystoreType JKS
+          prop_replace nifi.security.keystorePasswd "{{ .Values.auth.SSL.keystorePasswd }}"
+          prop_replace nifi.security.truststore "${NIFI_HOME}/tls/truststore.jks"
+          prop_replace nifi.security.truststoreType JKS
+          prop_replace nifi.security.truststorePasswd "{{ .Values.auth.SSL.truststorePasswd }}"
+
+          prop_replace nifi.web.https.host "$(hostname).{{ template "apache-nifi.fullname" $ }}-headless.{{ $.Release.Namespace }}.svc.{{ $.Values.certManager.clusterDomain }}"
+          prop_replace nifi.cluster.node.address "$(hostname).{{ template "apache-nifi.fullname" $ }}-headless.{{ $.Release.Namespace }}.svc.{{ $.Values.certManager.clusterDomain }}"
+          prop_replace nifi.web.https.network.interface.default eth0
+          prop_replace nifi.web.https.network.interface.lo lo
+          prop_replace nifi.web.http.host ""
+          prop_replace nifi.web.http.port ""
+
           if [ ! -r "${NIFI_HOME}/conf/nifi-cert.pem" ]
           then
             /opt/nifi/nifi-toolkit-current/bin/tls-toolkit.sh standalone \

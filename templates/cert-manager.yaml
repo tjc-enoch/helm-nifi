@@ -87,6 +87,7 @@ spec:
       passwordSecretRef:
         name: nifi-keystore-password
         key: password
+      includeCA: false
 ---
 {{/* range untilStep 0 (int .Values.replicaCount ) 1 */}}{{ end }}
 apiVersion: v1

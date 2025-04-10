@@ -681,7 +681,6 @@ spec:
           do
             pullNodeSecretData
             jq -r '."keystore.jks"' < /tmp/secret-data.json | base64 -d > ${NIFI_HOME}/tls/keystore.jks
-
             echo Starting to sleep for {{ .Values.certManager.refreshSeconds }} seconds at $(date)
             sleep {{ .Values.certManager.refreshSeconds }}
           done

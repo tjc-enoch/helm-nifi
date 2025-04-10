@@ -253,28 +253,14 @@ spec:
 
 {{- /* if .Values.certManager.enabled */}}{{ else }}
 
-          prop_replace nifi.security.keystore "${NIFI_HOME}/tls/keystore.jks"
-          prop_replace nifi.security.keystoreType JKS
-          prop_replace nifi.security.keystorePasswd "{{ .Values.auth.SSL.keystorePasswd }}"
-          prop_replace nifi.security.truststore "${NIFI_HOME}/tls/truststore.jks"
-          prop_replace nifi.security.truststoreType JKS
-          prop_replace nifi.security.truststorePasswd "{{ .Values.auth.SSL.truststorePasswd }}"
-
-          prop_replace nifi.web.https.host "$(hostname).{{ template "apache-nifi.fullname" $ }}-headless.{{ $.Release.Namespace }}.svc.{{ $.Values.certManager.clusterDomain }}"
-          prop_replace nifi.cluster.node.address "$(hostname).{{ template "apache-nifi.fullname" $ }}-headless.{{ $.Release.Namespace }}.svc.{{ $.Values.certManager.clusterDomain }}"
-          prop_replace nifi.web.https.network.interface.default eth0
-          prop_replace nifi.web.https.network.interface.lo lo
-          prop_replace nifi.web.http.host ""
-          prop_replace nifi.web.http.port ""
-
           if [ ! -r "${NIFI_HOME}/conf/nifi-cert.pem" ]
           then
             /opt/nifi/nifi-toolkit-current/bin/tls-toolkit.sh standalone \
-              -n '{{.Release.Name}}-nifi-0.{{.Release.Name}}-nifi-headless.{{.Release.Namespace}}.svc.cluster.local' \
+              -n '$(hostname).{{ template "apache-nifi.fullname" $ }}-headless.{{ $.Release.Namespace }}.svc.cluster.local' \
               -C '{{.Values.auth.admin}}' \
-              -o "${NIFI_HOME}/conf/" \
-              -P {{.Values.auth.SSL.truststorePasswd}} \
-              -S {{.Values.auth.SSL.keystorePasswd}} \
+              -o "${NIFI_HOME}/tls/" \
+              -P {{ .Values.auth.SSL.truststorePasswd }} \
+              -S {{ .Values.auth.SSL.keystorePasswd }} \
               --nifiPropertiesFile /opt/nifi/nifi-current/conf/nifi.properties
           fi
 
@@ -694,31 +680,7 @@ spec:
           while :
           do
             pullNodeSecretData
-            jq -r '."tls.crt"' < /tmp/secret-data.json | base64 -d > /tmp/tls.crt
-            jq -r '."tls.key"' < /tmp/secret-data.json | base64 -d > /tmp/tls.key
-            if ! diff /tmp/tls.crt.old /tmp/tls.crt > /dev/null
-            then
-              openssl pkcs12 -export -in      "/tmp/tls.crt" \
-                                     -inkey   "/tmp/tls.key" \
-                                     -name    "${NODENAME}" \
-                                     -out     "/tmp/tls.p12" \
-                                     -passout "pass:{{ .Values.certManager.keystorePasswd }}"
-              rm -f "${NIFI_HOME}/tls/keystore-new.jks"
-              keytool -importkeystore \
-                      -noprompt \
-                      -destkeystore "${NIFI_HOME}/tls/keystore-new.jks" \
-                      -srckeystore "/tmp/tls.p12" \
-                      -srcstoretype PKCS12 \
-                      -deststoretype JKS \
-                      -srcstorepass "{{ .Values.certManager.keystorePasswd }}" \
-                      -deststorepass "{{ .Values.certManager.keystorePasswd }}"
-              mv  "${NIFI_HOME}/tls/keystore-new.jks" "${NIFI_HOME}/tls/keystore.jks"
-              mv /tmp/tls.crt /tmp/tls.crt.old
-            fi
-
-            ls -l "${NIFI_HOME}/tls/keystore.jks"
-            keytool -list -keystore "${NIFI_HOME}/tls/keystore.jks" \
-                          -storepass "{{ .Values.certManager.keystorePasswd }}"
+            jq -r '."keystore.jks"' > ${NIFI_HOME}/tls/keystore.jks
 
             echo Starting to sleep for {{ .Values.certManager.refreshSeconds }} seconds at $(date)
             sleep {{ .Values.certManager.refreshSeconds }}

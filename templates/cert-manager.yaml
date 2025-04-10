@@ -40,6 +40,15 @@ spec:
   ca:
     secretName: {{ template "apache-nifi.fullname" $ }}-ca
 ---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: nifi-keystore-password
+  namespace: {{ $.Release.Namespace }}
+type: Opaque
+stringData:
+  password: {{ .Values.certManager.keystorePasswd }} 
+---
 {{ range untilStep 0 (int .Values.replicaCount) 1 }}
 apiVersion: cert-manager.io/v1
 kind: Certificate
@@ -72,6 +81,11 @@ spec:
   issuerRef:
     name: {{ template "apache-nifi.fullname" $ }}-ca
     kind: Issuer
+  jks:
+    create: true
+    passwordSecretRef:
+      name: nifi-keystore-password
+      key: password
 ---
 {{/* range untilStep 0 (int .Values.replicaCount ) 1 */}}{{ end }}
 apiVersion: v1

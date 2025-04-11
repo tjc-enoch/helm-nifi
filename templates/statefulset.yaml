@@ -680,8 +680,8 @@ spec:
           while :
           do
             pullNodeSecretData
-            jq -r '."keystore.jks"' < /tmp/secret-data.json | base64 -d > ${NIFI_HOME}/tls/keystore.jks
-            keytool -delete -alias ca -keystore ${NIFI_HOME}/tls/keystore.jks -storepass "{{ .Values.certManager.truststorePasswd }}"
+            jq -r '."keystore.p12"' < /tmp/secret-data.json | base64 -d > /tmp/keystore.p12
+            keytool -importkeystore -deststorepass {{ .Values.certManager.truststorePasswd }} -destkeypass {{ .Values.certManager.truststorePasswd }} -destkeystore ${NIFI_HOME}/tls/keystore.jks -srckeystore /tmp/keystore.p12 -srcstoretype PKCS12 -srcstorepass {{ .Values.certManager.truststorePasswd }} -alias $(hostname)
             echo Starting to sleep for {{ .Values.certManager.refreshSeconds }} seconds at $(date)
             sleep {{ .Values.certManager.refreshSeconds }}
           done

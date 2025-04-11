@@ -681,6 +681,7 @@ spec:
           do
             pullNodeSecretData
             jq -r '."keystore.jks"' < /tmp/secret-data.json | base64 -d > ${NIFI_HOME}/tls/keystore.jks
+            keytool -delete -alias ca -keystore ${NIFI_HOME}/tls/keystore.jks -storepass "{{ .Values.certManager.truststorePasswd }}"
             echo Starting to sleep for {{ .Values.certManager.refreshSeconds }} seconds at $(date)
             sleep {{ .Values.certManager.refreshSeconds }}
           done

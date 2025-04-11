@@ -681,7 +681,14 @@ spec:
           do
             pullNodeSecretData
             jq -r '."keystore.p12"' < /tmp/secret-data.json | base64 -d > /tmp/keystore.p12
-            keytool -importkeystore -deststorepass {{ .Values.certManager.truststorePasswd }} -destkeypass {{ .Values.certManager.truststorePasswd }} -destkeystore ${NIFI_HOME}/tls/keystore.jks -srckeystore /tmp/keystore.p12 -srcstoretype PKCS12 -srcstorepass {{ .Values.certManager.truststorePasswd }} -alias $(hostname)
+            keytool -importkeystore \
+                    -deststorepass {{ .Values.certManager.keystorePasswd }} \
+                    -destkeystore ${NIFI_HOME}/tls/keystore.jks \
+                    -srckeystore /tmp/keystore.p12 \
+                    -srcstoretype PKCS12 \
+                    -srcstorepass {{ .Values.certManager.keystorePasswd }} \
+                    -alias $(hostname) \
+                    -J-Dcom.redhat.fips=false
             echo Starting to sleep for {{ .Values.certManager.refreshSeconds }} seconds at $(date)
             sleep {{ .Values.certManager.refreshSeconds }}
           done

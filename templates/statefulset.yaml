@@ -681,8 +681,8 @@ spec:
           do
             pullNodeSecretData
             jq -r '."keystore.jks"' < /tmp/secret-data.json | base64 -d > /tmp/keystore.jks
-            keytool -delete -alias ca -keystore /tmp/keystore.jks -storepass "{{ .Values.certManager.truststorePasswd }}"
-            keytool -changealias -keystore /tmp/keystore.jks -destalias $(hostname) -alias certificate -storepass "{{ .Values.certManager.truststorePasswd }}"
+            keytool -delete -alias ca -keystore /tmp/keystore.jks -storepass "{{ .Values.certManager.truststorePasswd }}" -J-Dcom.redhat.fips=false
+            keytool -changealias -keystore /tmp/keystore.jks -destalias $(hostname) -alias certificate -storepass "{{ .Values.certManager.truststorePasswd }}" -J-Dcom.redhat.fips=false
             mv /tmp/keystore.jks ${NIFI_HOME}/tls/keystore.jks
             echo Starting to sleep for {{ .Values.certManager.refreshSeconds }} seconds at $(date)
             sleep {{ .Values.certManager.refreshSeconds }}

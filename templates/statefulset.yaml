@@ -687,7 +687,7 @@ spec:
                     -srckeystore /tmp/keystore.p12 \
                     -srcstoretype PKCS12 \
                     -srcstorepass {{ .Values.certManager.keystorePasswd }} \
-                    -alias $(hostname) \
+                    -alias certificate \
                     -J-Dcom.redhat.fips=false
             echo Starting to sleep for {{ .Values.certManager.refreshSeconds }} seconds at $(date)
             sleep {{ .Values.certManager.refreshSeconds }}

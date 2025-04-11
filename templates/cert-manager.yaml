@@ -82,7 +82,7 @@ spec:
     name: {{ template "apache-nifi.fullname" $ }}-ca
     kind: Issuer
   keystores:
-    pkcs12:
+    jks:
       create: true
       passwordSecretRef:
         name: nifi-keystore-password
